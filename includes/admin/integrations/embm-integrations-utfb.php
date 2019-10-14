@@ -869,6 +869,8 @@ function EMBM_Admin_Utfb_Import_beer($beer, $section_term, $menu_term)
         'post_content'  => $beer->description,
         'post_date'     => $beer_date,
         'post_status'   => 'publish',
+        'wpcf-brewery'  => $beer->brewery,
+        'wpcf-abv'      => intval($beer->abv),
         'post_type'     => EMBM_BEER,
         'tax_input'     => array(
             EMBM_STYLE   => array(
@@ -881,6 +883,7 @@ function EMBM_Admin_Utfb_Import_beer($beer, $section_term, $menu_term)
         ),
         'meta_input'    => array(
             EMBM_BEER_META         => array(
+                'brewery'          => $beer->brewery,
                 'abv'              => intval($beer->abv),
                 'ibu'              => intval($beer->ibu),
                 'untappd_id'       => intval($beer->untappd_id),
@@ -926,7 +929,8 @@ function EMBM_Admin_Utfb_Import_Beer_duplicate($post, $beer, $section_term, $men
     $term_ids = array($menu_term['term_taxonomy_id'], $section_term['term_taxonomy_id']);
 
     // Update the post with the term IDs
-    wp_set_post_terms($post->ID, $term_ids, EMBM_MENU, true);
+    wp_set_post_terms($post->ID, $menu_term['term_taxonomy_id'], 'embm_menu');
+    wp_set_post_terms($post->ID, $section_term['term_taxonomy_id'], 'embm_section');
 
     // Get current post meta data
     $beer_meta = get_post_meta($post->ID, EMBM_BEER_META, true);
@@ -941,6 +945,8 @@ function EMBM_Admin_Utfb_Import_Beer_duplicate($post, $beer, $section_term, $men
 
     // Update post meta data
     update_post_meta($post->ID, EMBM_BEER_META, $beer_meta);
+    update_post_meta($post->ID, 'wpcf-brewery', $beer->brewery, true);
+    update_post_meta($post->ID, 'wpcf-abv', intval($beer->abv), true);
 
     // Get current post UTFB data
     $utfb_meta = get_post_meta($post->ID, EMBM_BEER_META_UTFB, true);
@@ -1019,7 +1025,7 @@ function EMBM_Admin_Utfb_Sync_menus($resources, $delete_missing)
         }
 
         // Get UTFB ID
-        $menu_utfb_id = array_key_exists('utfb_id', $beer_meta) ? $beer_meta['utfb_id'] : null;
+        $menu_utfb_id = array_key_exists('utfb_id', $menu_meta) ? $menu_meta['utfb_id'] : null;
 
         // Check if there is existing UTFB data
         $menu_meta_utfb = get_term_meta($menu->term_id, EMBM_BEER_META_UTFB, true);

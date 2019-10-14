@@ -257,18 +257,23 @@ function EMBM_Core_Beer_meta($post_id, $attr)
 
     // Format the data
     switch ($attr) {
-    case 'abv':
-        if (array_key_exists($attr, $profile) && $profile[$attr] > 0) {
-            return $profile[$attr] . '%';
-        }
-        break;
-    case 'ibu':
+    	case 'brewery':
         if (array_key_exists($attr, $profile) && $profile[$attr] > 0) {
             return $profile[$attr];
         }
         break;
+    case 'abv':
+        if (array_key_exists($attr, $profile)) {
+            return $profile[$attr] . '%';
+        }
+        break;
+    case 'ibu':
+        if (array_key_exists($attr, $profile)) {
+            return $profile[$attr];
+        }
+        break;
     case 'beer_num':
-        if (array_key_exists($attr, $profile) && $profile[$attr] !== '') {
+        if (array_key_exists($attr, $profile)) {
             return '#' . $profile[$attr];
         }
         break;
@@ -669,6 +674,7 @@ function EMBM_Core_Beer_Api_get($object, $field_name, $request)
             'hops'      => $beer_meta['hops'],
             'additions' => $beer_meta['adds'],
             'yeast'     => $beer_meta['yeast'],
+            'brewery'   => $beer_meta['brewery'],
             'abv'       => ($abv == 0) ? null : $abv,
             'ibu'       => ($ibu == 0) ? null : $ibu
         );
@@ -724,7 +730,7 @@ function EMBM_Core_Beer_Api_update($value, $object, $field_name)
 
     // Set up attr hash
     $fields = array(
-        'embm_profile' => array('malts', 'hops', 'adds', 'yeast', 'ibu', 'abv'),
+        'embm_profile' => array('malts', 'hops', 'adds', 'yeast', 'ibu', 'abv', 'brewery'),
         'embm_extras'  => array('beer_num', 'avail', 'notes')
     );
 
@@ -813,7 +819,11 @@ function EMBM_Core_Beer_Api_schema($field_name)
                 'abv'       => array(
                     'description'   => esc_html__('The beer ABV percentage for the object.', 'em-beer-manager'),
                     'type'          => 'number'
-                )
+                ),
+				'brewery'    => array(
+                    'description'   => esc_html__('The brewery that made the object..', 'em-beer-manager'),
+                    'type'          => 'string'
+                ),
             )
         );
     }
