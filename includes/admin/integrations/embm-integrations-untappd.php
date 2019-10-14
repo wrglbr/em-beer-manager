@@ -724,13 +724,13 @@ function EMBM_Admin_Untappd_Find_id($beer)
     // Return null if ID does not exist
     if (!$beer->$meta_key
         || !array_key_exists('untappd_id', $beer->$meta_key)
-        || !$beer->$meta_key['untappd_id']
+        || !$beer->{$meta_key['untappd_id']}
     ) {
         return null;
     }
 
     // Return Untappd ID
-    return $beer->$meta_key['untappd_id'];
+    return $beer->{$meta_key['untappd_id']};
 }
 
 /**
