@@ -802,7 +802,7 @@ function EMBM_Admin_Utfb_import($resources)
     // Iterate over beers
     foreach ($beers as $beer) {
         // Get section from ID
-        $section = EMBM_Admin_Utfb_find($sections, $section_id);
+        $section = EMBM_Admin_Utfb_find($sections, $beer->$section_id);
         $menu = EMBM_Admin_Utfb_find($menus, $section->menu_id);
 
         // Import beer
@@ -928,7 +928,7 @@ function EMBM_Admin_Utfb_Import_Beer_duplicate($post, $beer, $section_term, $men
     // Set list of term IDs to add
     $term_ids = array($menu_term['term_taxonomy_id'], $section_term['term_taxonomy_id']);
 
-
+     wp_set_post_terms($post->ID, $term_ids, EMBM_MENU, true);
 
     // Get current post meta data
     $beer_meta = get_post_meta($post->ID, EMBM_BEER_META, true);
@@ -958,7 +958,11 @@ function EMBM_Admin_Utfb_Import_Beer_duplicate($post, $beer, $section_term, $men
     $utfb_meta = array($beer_data);
 
     // Update the post with the term IDs
-    wp_set_post_terms($post->ID, $term_ids, 'embm_menu');
+    if (is_array($utfb_meta)) { 
+        array_push($utfb_meta, $beer_data); 
+    } else {    
+        $utfb_meta = array($beer_data); 
+    }
 
     update_post_meta($post->ID, 'wpcf-brewery', $beer->brewery, true);
     update_post_meta($post->ID, 'wpcf-abv', intval($beer->abv), true);
