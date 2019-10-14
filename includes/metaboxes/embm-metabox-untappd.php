@@ -173,7 +173,7 @@ function EMBM_Admin_Metabox_Untappd_content()
                     id="embm_untappd"
                     data-value="<?php echo $untappd_id; ?>"
                     value="<?php echo $untappd_id; ?>"
-                <?php if (($is_brewery || $utfb_id !== '') && $beer_found && !$show_api_error) : ?>
+                <?php if (($is_brewery || $untappd_id !== '') && $beer_found && !$show_api_error) : ?>
                     readonly
                 <?php endif; ?>
                 />

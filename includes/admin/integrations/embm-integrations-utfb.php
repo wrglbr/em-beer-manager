@@ -802,7 +802,7 @@ function EMBM_Admin_Utfb_import($resources)
     // Iterate over beers
     foreach ($beers as $beer) {
         // Get section from ID
-        $section = EMBM_Admin_Utfb_find($sections, $beer->section_id);
+        $section = EMBM_Admin_Utfb_find($sections, $section_id);
         $menu = EMBM_Admin_Utfb_find($menus, $section->menu_id);
 
         // Import beer
@@ -928,9 +928,7 @@ function EMBM_Admin_Utfb_Import_Beer_duplicate($post, $beer, $section_term, $men
     // Set list of term IDs to add
     $term_ids = array($menu_term['term_taxonomy_id'], $section_term['term_taxonomy_id']);
 
-    // Update the post with the term IDs
-    wp_set_post_terms($post->ID, $menu_term['term_taxonomy_id'], 'embm_menu');
-    wp_set_post_terms($post->ID, $section_term['term_taxonomy_id'], 'embm_section');
+
 
     // Get current post meta data
     $beer_meta = get_post_meta($post->ID, EMBM_BEER_META, true);
@@ -938,15 +936,14 @@ function EMBM_Admin_Utfb_Import_Beer_duplicate($post, $beer, $section_term, $men
 
     // Add new UTFB ID to array of IDs
     if (array_key_exists('utfb_ids', $beer_meta) && !in_array($beer->id, $beer_meta['utfb_ids'])) {
-        array_push($beer_meta['utfb_ids'], $beer->id);
+        array_push($beer_meta['utfb_ids'], array($beer->id));
     } else {
         $beer_meta['utfb_ids'] = array($beer->id);
     }
 
     // Update post meta data
     update_post_meta($post->ID, EMBM_BEER_META, $beer_meta);
-    update_post_meta($post->ID, 'wpcf-brewery', $beer->brewery, true);
-    update_post_meta($post->ID, 'wpcf-abv', intval($beer->abv), true);
+    
 
     // Get current post UTFB data
     $utfb_meta = get_post_meta($post->ID, EMBM_BEER_META_UTFB, true);
@@ -957,12 +954,14 @@ function EMBM_Admin_Utfb_Import_Beer_duplicate($post, $beer, $section_term, $men
         'cached'    => time()
     );
 
-    if (is_array($utfb_meta)) {
-        array_push($utfb_meta, $beer_data);
-    } else {
-        $utfb_meta = array($beer_data);
-    }
 
+    $utfb_meta = array($beer_data);
+
+    // Update the post with the term IDs
+    wp_set_post_terms($post->ID, $term_ids, 'embm_menu');
+
+    update_post_meta($post->ID, 'wpcf-brewery', $beer->brewery, true);
+    update_post_meta($post->ID, 'wpcf-abv', intval($beer->abv), true);
     // Update UTFB meta data
     update_post_meta($post->ID, EMBM_BEER_META_UTFB, $utfb_meta);
 }
